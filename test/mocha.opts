@@ -1,0 +1,4 @@
+test/**/*.js
+--reporter spec
+--timeout 10000
+--require co-mocha
