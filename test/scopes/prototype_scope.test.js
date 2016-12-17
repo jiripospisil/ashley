@@ -4,10 +4,10 @@ const { expect } = require('chai');
 const PrototypeScope = require('../../src/scopes/prototype_scope');
 
 describe('PrototypeScope', function() {
-  it('creates and returns always a new instance', function *() {
+  it('creates and returns always a new instance', async function() {
     let called = 0;
 
-    const provider = function *() {
+    const provider = async function() {
       called++;
 
       return {
@@ -17,24 +17,24 @@ describe('PrototypeScope', function() {
 
     const scope = new PrototypeScope({ create: provider });
 
-    const obj = yield scope.get();
+    const obj = await scope.get();
     expect(obj.foo).to.equal(42);
 
-    const obj2 = yield scope.get();
+    const obj2 = await scope.get();
     expect(obj2.foo).to.equal(42);
 
     expect(obj).to.not.equal(obj2);
     expect(called).to.equal(2);
   });
 
-  it('set-ups the returned object with a function', function *() {
+  it('set-ups the returned object with a function', async function() {
     let called = 0;
 
     const obj = {
       foo: 42
     };
 
-    const provider = function *() {
+    const provider = async function() {
       return obj;
     };
 
@@ -45,38 +45,38 @@ describe('PrototypeScope', function() {
 
     const scope = new PrototypeScope({ create: provider }, { setup });
 
-    yield scope.get();
-    yield scope.get();
+    await scope.get();
+    await scope.get();
 
     expect(called).to.equal(2);
   });
 
-  it('set-ups the returned object with a generator function', function *() {
+  it('set-ups the returned object with an async function', async function() {
     let called = 0;
 
     const obj = {
       foo: 42
     };
 
-    const provider = function *() {
+    const provider = async function() {
       return obj;
     };
 
-    const setup = function *(newObj) {
+    const setup = async function(newObj) {
       called++;
       expect(newObj).to.equal(obj);
     };
 
     const scope = new PrototypeScope({ create: provider }, { setup });
 
-    yield scope.get();
-    yield scope.get();
+    await scope.get();
+    await scope.get();
 
     expect(called).to.equal(2);
   });
 
-  it('validates that the setup function is indeed a function', function *() {
-    const provider = function *() {
+  it('validates that the setup function is indeed a function', async function() {
+    const provider = async function() {
       return {
         foo: 42
       };
@@ -84,7 +84,7 @@ describe('PrototypeScope', function() {
 
     try {
       const scope = new PrototypeScope({ create: provider }, { setup: 123 });
-      yield scope.get();
+      await scope.get();
       throw new Error('shouldnothappen');
     } catch (e) {
       expect(e.message).to.match(/Expected "setup" be to a function but got "123"./);

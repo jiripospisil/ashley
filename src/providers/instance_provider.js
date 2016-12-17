@@ -17,29 +17,29 @@ class InstanceProvider {
     });
   }
 
-  *create() {
-    const dependencies = yield this.container.resolveAll(this.dependencies);
+  async create() {
+    const dependencies = await this.container.resolveAll(this.dependencies);
     const instance = new this.target(...dependencies);
 
     if (this.options.initialize) {
-      yield this._initializeInstance(instance);
+      await this._initializeInstance(instance);
     }
 
     return instance;
   }
 
-  *_initializeInstance(instance) {
+  async _initializeInstance(instance) {
     const { initialize } = this.options;
     const methodName = this._lifeCycleMethodName(initialize, 'initialize');
 
-    if (instance[methodName] && utils.isGeneratorFunction(instance[methodName])) {
-      return yield instance[methodName].call(instance);
+    if (instance[methodName] && utils.isAsyncFunction(instance[methodName])) {
+      return await instance[methodName].call(instance);
     }
 
-    throw new errors.Error(`Unable to find a generator method called "${methodName}" on an instance of "${this.bindName}".`);
+    throw new errors.Error(`Unable to find an async method called "${methodName}" on an instance of "${this.bindName}".`);
   }
 
-  *deinitializeInstance(instance) {
+  async deinitializeInstance(instance) {
     if (!instance) {
       return;
     }
@@ -47,11 +47,11 @@ class InstanceProvider {
     const { deinitialize } = this.options;
     const methodName = this._lifeCycleMethodName(deinitialize, 'deinitialize');
 
-    if (instance[methodName] && utils.isGeneratorFunction(instance[methodName])) {
-      return yield instance[methodName].call(instance);
+    if (instance[methodName] && utils.isAsyncFunction(instance[methodName])) {
+      return await instance[methodName].call(instance);
     }
 
-    throw new errors.Error(`Unable to find a generator method called "${methodName}" on an instance of "${this.bindName}".`);
+    throw new errors.Error(`Unable to find an async method called "${methodName}" on an instance of "${this.bindName}".`);
   }
 
   _lifeCycleMethodName(value, defaultValue) {

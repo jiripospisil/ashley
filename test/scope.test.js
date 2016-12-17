@@ -4,7 +4,7 @@ const { expect } = require('chai');
 const Scope = require('../src/scope');
 
 describe('Scope', function() {
-  it('forwards messages to functions', function *() {
+  it('forwards messages to functions', async function() {
     let called = 0;
 
     const instance = new class extends Scope {
@@ -16,15 +16,15 @@ describe('Scope', function() {
       }
     };
 
-    yield instance.handleMessage('reset', 1, 2);
+    await instance.handleMessage('reset', 1, 2);
     expect(called).to.equal(1);
   });
 
-  it('forwards messages to generator functions', function *() {
+  it('forwards messages to async functions', async function() {
     let called = 0;
 
     const instance = new class extends Scope {
-      *reset(a, b) {
+      async reset(a, b) {
         expect(this).to.not.be.undefined;
         expect(a).to.equal(1);
         expect(b).to.equal(2);
@@ -32,16 +32,16 @@ describe('Scope', function() {
       }
     };
 
-    yield instance.handleMessage('reset', 1, 2);
+    await instance.handleMessage('reset', 1, 2);
     expect(called).to.equal(1);
   });
 
-  it('doesnt mind if the receiver doesnt implement the method', function *() {
+  it('doesn\'t mind if the receiver doesn\'t implement the method', async function() {
     let called = 0;
 
     const instance = new class extends Scope {};
 
-    yield instance.handleMessage('reset', 1, 2);
+    await instance.handleMessage('reset', 1, 2);
     expect(called).to.equal(0);
   });
 });

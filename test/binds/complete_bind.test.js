@@ -10,7 +10,7 @@ describe('CompleteBind', function() {
     expect(bind.dependencies).to.deep.equal(provider.dependencies);
   });
 
-  it('validates itself before calling the scope', function *() {
+  it('validates itself before calling the scope', async function() {
     let called = 0;
 
     const container = {
@@ -24,7 +24,7 @@ describe('CompleteBind', function() {
     const bind = new CompleteBind(container, 'name1', 'scope1', provider);
 
     try {
-      yield bind.get();
+      await bind.get();
       throw new Error('should not be here');
     } catch (e) {
       expect(e).to.match(/Unable to resolve/);
@@ -32,18 +32,18 @@ describe('CompleteBind', function() {
     }
   });
 
-  it('delegates the get to the given scope', function *() {
+  it('delegates the get to the given scope', async function() {
     let called = 0;
 
     const scope = {
-      *get() {
+      async get() {
         called++;
       }
     };
 
     const bind = new CompleteBind('container1', 'name1', scope, 'provider1');
 
-    yield bind.get();
+    await bind.get();
     expect(called).to.equal(1);
   });
 });

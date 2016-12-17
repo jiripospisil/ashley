@@ -7,7 +7,7 @@ const utils = require('./../../src/utils');
 const FunctionProvider = require('../../src/providers/function_provider');
 
 describe('FunctionProvider', function() {
-  it('returns a function which gets invoked with the dependencies', function *() {
+  it('returns a function which gets invoked with the dependencies', async function() {
     let called = 0;
 
     const fn = function(a, b) {
@@ -17,7 +17,7 @@ describe('FunctionProvider', function() {
     };
 
     const container = {
-      *resolve(dependency) {
+      async resolve(dependency) {
         called++;
         if (_.includes(['a', 'b'], dependency)) {
           return `${dependency}1`;
@@ -27,13 +27,13 @@ describe('FunctionProvider', function() {
     };
 
     const provider = new FunctionProvider('name1', container, fn, ['a', 'b']);
-    const result = yield provider.create();
-    yield result();
+    const result = await provider.create();
+    await result();
 
     expect(called).to.equal(3);
   });
 
-  it('supports optional placeholders what will be replaced with actual values', function *() {
+  it('supports optional placeholders what will be replaced with actual values', async function() {
     let called = 0;
 
     const fn = function(a, b, c, d) {
@@ -45,7 +45,7 @@ describe('FunctionProvider', function() {
     };
 
     const container = {
-      *resolve(dependency) {
+      async resolve(dependency) {
         called++;
         if (_.includes(['a', 'c'], dependency)) {
           return `${dependency}1`;
@@ -55,8 +55,8 @@ describe('FunctionProvider', function() {
     };
 
     const provider = new FunctionProvider('name1', container, fn, ['a', utils._, 'c', utils._]);
-    const result = yield provider.create();
-    yield result('b1', 'd1');
+    const result = await provider.create();
+    await result('b1', 'd1');
 
     expect(called).to.equal(3);
   });

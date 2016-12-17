@@ -11,9 +11,9 @@ class CompleteBind extends ValidatableBind {
     this._provider = provider;
   }
 
-  *get() {
+  async get() {
     this.validate();
-    return yield this._scope.get();
+    return await this._scope.get();
   }
 
   get dependencies() {

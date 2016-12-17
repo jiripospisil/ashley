@@ -6,10 +6,10 @@
  */
 module.exports._ = '<ARG_PLACEHOLDER>';
 
-module.exports.isGeneratorFunction = function(fn) {
+module.exports.isAsyncFunction = function(fn) {
   if (!fn || !fn.constructor) {
     return false;
   }
 
-  return fn.constructor.name === 'GeneratorFunction';
+  return fn.constructor.name === 'AsyncFunction';
 };

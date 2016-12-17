@@ -16,10 +16,10 @@ class Ashley {
     this._scopesToDeinitialize = [];
   }
 
-  *shutdown() {
+  async shutdown() {
     for (const scope of this._scopesToDeinitialize) {
       if (scope.deinitialize) {
-        yield scope.deinitialize();
+        await scope.deinitialize();
       }
     }
   }
@@ -38,8 +38,8 @@ class Ashley {
 
     const bind = this._bind(name, this._bindFactory.create('Instance', this, name, scope, provider));
 
-    this.factory(name, function *() {
-      return yield provider.create();
+    this.factory(name, async function() {
+      return await provider.create();
     });
 
     if (_.get(options, 'deinitialize')) {
@@ -103,14 +103,14 @@ class Ashley {
       name, resolvedTarget));
   }
 
-  *resolve(name) {
+  async resolve(name) {
     debug(`Resolving "${name}".`);
 
     const bind = this.findBind(name);
 
     if (bind) {
-      if (utils.isGeneratorFunction(bind.get)) {
-        return yield bind.get();
+      if (utils.isAsyncFunction(bind.get)) {
+        return await bind.get();
       }
       return bind.get();
     }
@@ -118,11 +118,11 @@ class Ashley {
     throw new errors.Error(`Unable to resolve unbinded target "${name}".`);
   }
 
-  *resolveAll(names) {
+  async resolveAll(names) {
     const results = [];
 
     for (const name of (names || [])) {
-      results.push(yield this.resolve(name));
+      results.push(await this.resolve(name));
     }
 
     return results;

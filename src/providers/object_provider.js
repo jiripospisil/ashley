@@ -8,7 +8,7 @@ class ObjectProvider {
     this._options = options;
   }
 
-  *create() {
+  async create() {
     return this._target;
   }
 }

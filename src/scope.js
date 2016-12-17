@@ -14,12 +14,12 @@ class Scope {
     });
   }
 
-  *_setupInstance(instance) {
+  async _setupInstance(instance) {
     const { setup } = this.options;
 
     if (setup) {
-      if (utils.isGeneratorFunction(setup)) {
-        yield setup(instance);
+      if (utils.isAsyncFunction(setup)) {
+        await setup(instance);
       } else if (_.isFunction(setup)) {
         setup(instance);
       } else {
@@ -28,15 +28,15 @@ class Scope {
     }
   }
 
-  *handleMessage(type, ...args) {
+  async handleMessage(type, ...args) {
     const fn = this[type];
 
     if (!fn) {
       return;
     }
 
-    if (utils.isGeneratorFunction(fn)) {
-      yield fn.call(this, ...args);
+    if (utils.isAsyncFunction(fn)) {
+      await fn.call(this, ...args);
     } else if (_.isFunction(fn)) {
       fn.call(this, ...args);
     }

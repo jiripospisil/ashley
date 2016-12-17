@@ -10,11 +10,11 @@ class FactoryProvider {
     this.dependencies = dependencies;
   }
 
-  *create() {
-    const dependencies = yield this.container.resolveAll(this.dependencies);
+  async create() {
+    const dependencies = await this.container.resolveAll(this.dependencies);
 
-    if (utils.isGeneratorFunction(this.fn)) {
-      return yield this.fn(...dependencies);
+    if (utils.isAsyncFunction(this.fn)) {
+      return await this.fn(...dependencies);
     }
 
     return this.fn(...dependencies);
