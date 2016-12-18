@@ -30,8 +30,7 @@
     "src/"
   ],
   "keywords": [
-    "dependency",
-    "injection",
+    "dependency injection",
     "container",
     "di",
     "dic",
