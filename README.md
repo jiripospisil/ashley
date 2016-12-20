@@ -24,8 +24,9 @@ control](https://en.wikipedia.org/wiki/Inversion_of_control) on Wikipedia.
 npm install ashley
 ```
 
-Note that it makes heavy use of async functions and thus requires a fairly
-recent version of Node.js (7.x or newer).
+Note that it makes a heavy use of async functions and thus requires a fairly
+recent version of Node.js (7.x or newer). Depending on the version, you might
+need to pass the `--harmony-async-await` flag.
 
 # Usage
 
