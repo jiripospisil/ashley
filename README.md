@@ -487,7 +487,7 @@ class Service {
     this.itemFactory = itemFactory;
   }
 
-  *action() {
+  async action() {
     const item1 = await this.itemFactory.create();
     const item2 = await this.itemFactory.create();
     // ...
