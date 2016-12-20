@@ -9,22 +9,22 @@ const Ashley = require('../index');
 
 describe('Ashley', function() {
   describe('#instance', function() {
-    it('allows to bind an instance', function *() {
+    it('allows to bind an instance', async function() {
       class Class {}
 
       const ashley = new Ashley();
       ashley.instance('Instance', Class);
 
-      expect(yield ashley.resolve('Instance')).to.be.an.instanceof(Class);
+      expect(await ashley.resolve('Instance')).to.be.an.instanceof(Class);
     });
 
-    it('returns a generator function which resolves to the instance', function *() {
+    it('returns an async function which resolves to the instance', async function() {
       class Class {}
 
       const ashley = new Ashley();
       const fn = ashley.instance('Instance', Class);
 
-      expect(yield fn()).to.be.an.instanceof(Class);
+      expect(await fn()).to.be.an.instanceof(Class);
     });
 
     it('can be wrapped to return a promise', function(done) {
@@ -39,22 +39,22 @@ describe('Ashley', function() {
       });
     });
 
-    it('creates implicit factories', function *() {
+    it('creates implicit factories', async function() {
       class Class {}
 
       const ashley = new Ashley();
       ashley.instance('Instance', Class);
 
-      const factory = yield ashley.resolve('@factories/Instance');
-      const instance1 = yield factory.create();
-      const instance2 = yield factory.create();
+      const factory = await ashley.resolve('@factories/Instance');
+      const instance1 = await factory.create();
+      const instance2 = await factory.create();
 
       expect(instance1).to.be.an.instanceof(Class);
       expect(instance2).to.be.an.instanceof(Class);
       expect(instance1).to.not.equal(instance2);
     });
 
-    it('allows to set up individual instances', function *() {
+    it('allows to set up individual instances', async function() {
       let called = 0;
       class Class {}
 
@@ -67,7 +67,7 @@ describe('Ashley', function() {
         }
       });
 
-      yield ashley.resolveAll(['Instance', 'Instance2']);
+      await ashley.resolveAll(['Instance', 'Instance2']);
       expect(called).to.equal(1);
     });
 
@@ -83,7 +83,7 @@ describe('Ashley', function() {
     });
 
     describe('scopes', function() {
-      it('allows to specify the Singleton scope', function *() {
+      it('allows to specify the Singleton scope', async function() {
         class Class {}
 
         const ashley = new Ashley();
@@ -91,23 +91,23 @@ describe('Ashley', function() {
           scope: 'Singleton'
         });
 
-        const instance1 = yield ashley.resolve('Instance');
-        const instance2 = yield ashley.resolve('Instance');
+        const instance1 = await ashley.resolve('Instance');
+        const instance2 = await ashley.resolve('Instance');
 
         expect(instance1).to.equal(instance2);
       });
 
-      it('defaults to the Singleton scope', function *() {
+      it('defaults to the Singleton scope', async function() {
         class Class {}
 
         const ashley = new Ashley();
         ashley.instance('Instance', Class);
 
-        const [instance1, instance2] = yield ashley.resolveAll(['Instance', 'Instance']);
+        const [instance1, instance2] = await ashley.resolveAll(['Instance', 'Instance']);
         expect(instance1).to.equal(instance2);
       });
 
-      it('allows to specify the Prototype scope', function *() {
+      it('allows to specify the Prototype scope', async function() {
         class Class {}
 
         const ashley = new Ashley();
@@ -115,18 +115,18 @@ describe('Ashley', function() {
           scope: 'Prototype'
         });
 
-        const [instance1, instance2] = yield ashley.resolveAll(['Instance', 'Instance']);
+        const [instance1, instance2] = await ashley.resolveAll(['Instance', 'Instance']);
         expect(instance1).to.not.equal(instance2);
       });
 
-      it('allows to specify a custom scope', function *() {
+      it('allows to specify a custom scope', async function() {
         let called = 0;
 
         class Class {}
         class CustomPrototypeScope extends Scope {
-          *get() {
+          async get() {
             called++;
-            return yield this.provider.create();
+            return await this.provider.create();
           }
         }
 
@@ -136,7 +136,7 @@ describe('Ashley', function() {
           scope: 'CustomPrototypeScope'
         });
 
-        const [instance1, instance2] = yield ashley.resolveAll(['Instance', 'Instance']);
+        const [instance1, instance2] = await ashley.resolveAll(['Instance', 'Instance']);
 
         expect(instance1).to.not.equal(instance2);
         expect(called).to.equal(2);
@@ -156,7 +156,7 @@ describe('Ashley', function() {
     });
 
     describe('initialize', function() {
-      it('throws an error if the class doesn\'t implement the initialize method', function *() {
+      it('throws an error if the class doesn\'t implement the initialize method', async function() {
         class Class {}
 
         const ashley = new Ashley();
@@ -165,18 +165,18 @@ describe('Ashley', function() {
         });
 
         try {
-          yield ashley.resolve('Instance');
+          await ashley.resolve('Instance');
           throw new Error('should not be here');
         } catch (e) {
           expect(e).to.be.an.instanceof(Error);
         }
       });
 
-      it('initializes the instance every time with the Prototype scope', function *() {
+      it('initializes the instance every time with the Prototype scope', async function() {
         let called = 0;
 
         class Class {
-          *initialize() {
+          async initialize() {
             called++;
           }
         }
@@ -187,17 +187,17 @@ describe('Ashley', function() {
           initialize: true
         });
 
-        const [instance1, instance2] = yield ashley.resolveAll(['Instance', 'Instance']);
+        const [instance1, instance2] = await ashley.resolveAll(['Instance', 'Instance']);
 
         expect(instance1).to.not.equal(instance2);
         expect(called).to.equal(2);
       });
 
-      it('initializes the instance only once with the Singleton scope', function *() {
+      it('initializes the instance only once with the Singleton scope', async function() {
         let called = 0;
 
         class Class {
-          *initialize() {
+          async initialize() {
             called++;
           }
         }
@@ -208,7 +208,7 @@ describe('Ashley', function() {
           initialize: true
         });
 
-        const [instance1, instance2] = yield ashley.resolveAll(['Instance', 'Instance']);
+        const [instance1, instance2] = await ashley.resolveAll(['Instance', 'Instance']);
 
         expect(instance1).to.equal(instance2);
         expect(called).to.equal(1);
@@ -216,7 +216,7 @@ describe('Ashley', function() {
     });
 
     describe('dependencies', function() {
-      it('allows to specify dependencies', function *() {
+      it('allows to specify dependencies', async function() {
         let called = 0;
 
         class Dependency {
@@ -231,7 +231,7 @@ describe('Ashley', function() {
             expect(dep1).to.be.an.instanceof(Dependency);
           }
 
-          *initialize() {
+          async initialize() {
             called++;
           }
         }
@@ -256,7 +256,7 @@ describe('Ashley', function() {
         });
         ashley.instance('Instance', Class, ['Dependency', 'Dependency', 'Dependency2', 'Dependency2']);
 
-        expect(yield ashley.resolve('Instance')).to.be.an.instanceof(Class);
+        expect(await ashley.resolve('Instance')).to.be.an.instanceof(Class);
         expect(called).to.equal(6);
       });
     });
@@ -264,7 +264,7 @@ describe('Ashley', function() {
   });
 
   describe('#object', function() {
-    it('allows to bind simple objects', function *() {
+    it('allows to bind simple objects', async function() {
       const obj = {
         key: 42
       };
@@ -272,13 +272,13 @@ describe('Ashley', function() {
       const ashley = new Ashley();
       ashley.object('Object', obj);
 
-      const [obj1, obj2] = yield ashley.resolveAll(['Object', 'Object']);
+      const [obj1, obj2] = await ashley.resolveAll(['Object', 'Object']);
 
       expect(obj1).to.deep.equal(obj);
       expect(obj1).to.equal(obj2);
     });
 
-    it('returns a generator function which resolves to the object', function *() {
+    it('returns an async function which resolves to the object', async function() {
       const obj = {
         key: 42
       };
@@ -286,11 +286,11 @@ describe('Ashley', function() {
       const ashley = new Ashley();
       const fn = ashley.object('Object', obj);
 
-      expect(yield fn()).to.be.deep.equal(obj);
+      expect(await fn()).to.be.deep.equal(obj);
     });
 
     describe('clone', function() {
-      it('allows to clone each resolved object', function *() {
+      it('allows to clone each resolved object', async function() {
         const obj = {
           key: 42
         };
@@ -300,13 +300,13 @@ describe('Ashley', function() {
           clone: true
         });
 
-        const [obj1, obj2] = yield ashley.resolveAll(['Object', 'Object']);
+        const [obj1, obj2] = await ashley.resolveAll(['Object', 'Object']);
 
         expect(obj1).to.deep.equal(obj);
         expect(obj1).to.not.equal(obj2);
       });
 
-      it('allows to clone each resolved object with a custom function', function *() {
+      it('allows to clone each resolved object with a custom function', async function() {
         const obj = {
           key: 42
         };
@@ -321,7 +321,7 @@ describe('Ashley', function() {
           }
         });
 
-        const [obj1, obj2] = yield ashley.resolveAll(['Object', 'Object']);
+        const [obj1, obj2] = await ashley.resolveAll(['Object', 'Object']);
 
         expect(obj1).to.deep.equal(obj);
         expect(obj1).to.not.equal(obj2);
@@ -331,31 +331,31 @@ describe('Ashley', function() {
   });
 
   describe('#function', function() {
-    it('allows to bind a function', function *() {
+    it('allows to bind a function', async function() {
       let called = 0;
 
       const ashley = new Ashley();
       ashley.function('Func', () => called++);
 
-      const fn = yield ashley.resolve('Func');
-      yield fn();
-      yield fn();
+      const fn = await ashley.resolve('Func');
+      await fn();
+      await fn();
 
       expect(called).to.equal(2);
     });
 
-    it('returns a generator function which resolves to the function', function *() {
+    it('returns an async function which resolves to the function', async function() {
       let called = 0;
       const ashley = new Ashley();
       const fn = ashley.function('Func', () => called++);
 
-      yield (yield fn())();
-      yield (yield fn())();
+      await (await fn())();
+      await (await fn())();
 
       expect(called).to.equal(2);
     });
 
-    it('allows to bind a function with dependencies', function *() {
+    it('allows to bind a function with dependencies', async function() {
       let called = 0;
 
       const ashley = new Ashley();
@@ -367,13 +367,13 @@ describe('Ashley', function() {
         expect(b).to.equal(43);
       }, ['Param1', 'Param2']);
 
-      const fn = yield ashley.resolve('Func');
-      yield fn();
+      const fn = await ashley.resolve('Func');
+      await fn();
 
       expect(called).to.equal(1);
     });
 
-    it('allows to bind a function with parameters', function *() {
+    it('allows to bind a function with parameters', async function() {
       let called = 0;
 
       const ashley = new Ashley();
@@ -383,13 +383,13 @@ describe('Ashley', function() {
         expect(b).to.equal(43);
       }, [Ashley._, Ashley._]);
 
-      const fn = yield ashley.resolve('Func');
-      yield fn(42, 43);
+      const fn = await ashley.resolve('Func');
+      await fn(42, 43);
 
       expect(called).to.equal(1);
     });
 
-    it('allows to bind a function with parameters and dependencies', function *() {
+    it('allows to bind a function with parameters and dependencies', async function() {
       let called = 0;
 
       const ashley = new Ashley();
@@ -403,15 +403,15 @@ describe('Ashley', function() {
         expect(d).to.be.undefined;
       }, ['Param1', Ashley._, 'Param2', Ashley._]);
 
-      const fn = yield ashley.resolve('Func');
-      yield fn(43);
+      const fn = await ashley.resolve('Func');
+      await fn(43);
 
       expect(called).to.equal(1);
     });
   });
 
   describe('#factory', function() {
-    it('allows to bind and link a factory', function *() {
+    it('allows to bind and link a factory', async function() {
       let called = 0;
 
       const ashley = new Ashley();
@@ -421,7 +421,7 @@ describe('Ashley', function() {
       });
       ashley.link('StartDate', 'Date');
 
-      const [date1, date2] = yield ashley.resolveAll(['StartDate', 'StartDate']);
+      const [date1, date2] = await ashley.resolveAll(['StartDate', 'StartDate']);
 
       expect(date1).be.an.instanceof(Date);
       expect(date2).be.an.instanceof(Date);
@@ -429,12 +429,12 @@ describe('Ashley', function() {
       expect(called).to.equal(1);
     });
 
-    it('allows to retrieve the underlying factory function', function *() {
+    it('allows to retrieve the underlying factory function', async function() {
       const ashley = new Ashley();
       ashley.factory('Date', () => new Date());
 
-      const date = yield ashley.resolve('@factories/Date');
-      expect(yield date.create()).be.an.instanceof(Date);
+      const date = await ashley.resolve('@factories/Date');
+      expect(await date.create()).be.an.instanceof(Date);
     });
   });
 
@@ -459,45 +459,45 @@ describe('Ashley', function() {
   });
 
   describe('#shutdown', function() {
-    it('calls deinitialize on all binds which support it', function *() {
+    it('calls deinitialize on all binds which support it', async function() {
       let called = 0;
 
       const ashley = new Ashley();
       ashley.instance('Dependency1', class {
-        *deinitialize() {
+        async deinitialize() {
           called++;
         }
       }, [], { deinitialize: true });
-      yield ashley.resolve('Dependency1');
+      await ashley.resolve('Dependency1');
 
       ashley.instance('Dependency2', class {
-        *deinit() {
+        async deinit() {
           called++;
         }
       }, [], { deinitialize: 'deinit' });
-      yield ashley.resolve('Dependency2');
+      await ashley.resolve('Dependency2');
 
       // Not initialized
       ashley.instance('Dependency3', class {
-        *deinitialize() {
+        async deinitialize() {
           called++;
         }
       }, [], { deinitialize: true });
 
       ashley.instance('Dependency4', class {
-        *deinit() {
+        async deinit() {
           called++;
         }
       }, [], { deinitialize: true, scope: 'Prototype' });
 
-      yield ashley.shutdown();
+      await ashley.shutdown();
 
       expect(called).to.equal(2);
     });
   });
 
   describe('#createChild', function() {
-    it('creates a child container which shares the binds', function *() {
+    it('creates a child container which shares the binds', async function() {
       let called = 0;
       class Class {}
       class Class2 {
@@ -513,7 +513,7 @@ describe('Ashley', function() {
       child.instance('Instance2', Class2, ['Instance']);
 
       expect(() => child.validate()).to.not.throw(Error);
-      expect(yield child.resolve('Instance2')).to.be.an.instanceof(Class2);
+      expect(await child.resolve('Instance2')).to.be.an.instanceof(Class2);
       expect(called).to.equal(1);
     });
   });

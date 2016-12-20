@@ -4,7 +4,7 @@ const { expect } = require('chai');
 const InstanceProvider = require('../../src/providers/instance_provider');
 
 describe('InstanceProvider', function() {
-  it('constructs the target with all of its dependencies', function *() {
+  it('constructs the target with all of its dependencies', async function() {
     let called = 0;
 
     class Target {
@@ -17,14 +17,14 @@ describe('InstanceProvider', function() {
         expect(b).to.equal('b1');
       }
 
-      *initialize() {
+      async initialize() {
         // Should not be called
         called++;
       }
     }
 
     const container = {
-      *resolveAll(dependencies) {
+      async resolveAll(dependencies) {
         called++;
         expect(dependencies).to.deep.equal(['a', 'b']);
         return ['a1', 'b1'];
@@ -32,24 +32,24 @@ describe('InstanceProvider', function() {
     };
 
     const provider = new InstanceProvider('name1', container, Target, ['a', 'b']);
-    const instance = yield provider.create();
+    const instance = await provider.create();
 
     expect(instance.a).to.equal('a1');
     expect(instance.b).to.equal('b1');
     expect(called).to.equal(2);
   });
 
-  it('calls the initialize method if configured', function *() {
+  it('calls the initialize method if configured', async function() {
     let called = 0;
 
     class Target {
-      *initialize() {
+      async initialize() {
         called++;
       }
     }
 
     const container = {
-      *resolveAll() {
+      async resolveAll() {
         return [];
       }
     };
@@ -57,22 +57,22 @@ describe('InstanceProvider', function() {
     const provider = new InstanceProvider('name1', container, Target, [], {
       initialize: true
     });
-    yield provider.create();
+    await provider.create();
 
     expect(called).to.equal(1);
   });
 
-  it('calls the initialize method if configured with a different name', function *() {
+  it('calls the initialize method if configured with a different name', async function() {
     let called = 0;
 
     class Target {
-      *init() {
+      async init() {
         called++;
       }
     }
 
     const container = {
-      *resolveAll() {
+      async resolveAll() {
         return [];
       }
     };
@@ -80,16 +80,16 @@ describe('InstanceProvider', function() {
     const provider = new InstanceProvider('name1', container, Target, [], {
       initialize: 'init'
     });
-    yield provider.create();
+    await provider.create();
 
     expect(called).to.equal(1);
   });
 
-  it('throws an exception if the initialize method is not found', function *() {
+  it('throws an exception if the initialize method is not found', async function() {
     class Target {}
 
     const container = {
-      *resolveAll() {
+      async resolveAll() {
         return [];
       }
     };
@@ -99,20 +99,20 @@ describe('InstanceProvider', function() {
     });
 
     try {
-      yield provider.create();
+      await provider.create();
       throw new Error('should not be here');
     } catch (e) {
       expect(e).to.match(/Unable to find/);
     }
   });
 
-  it('throws an exception if the initialize method is found but it\'s not a generator', function *() {
+  it('throws an exception if the initialize method is found but it\'s not an async function', async function() {
     class Target {
       init() {}
     }
 
     const container = {
-      *resolveAll() {
+      async resolveAll() {
         return [];
       }
     };
@@ -122,7 +122,7 @@ describe('InstanceProvider', function() {
     });
 
     try {
-      yield provider.create();
+      await provider.create();
       throw new Error('should not be here');
     } catch (e) {
       expect(e).to.match(/Unable to find/);

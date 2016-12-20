@@ -7,25 +7,25 @@ const errors = require('../errors');
 const Scope = require('../scope');
 
 class CloneScope extends Scope {
-  *get() {
-    const instance = yield this.provider.create();
+  async get() {
+    const instance = await this.provider.create();
 
     if (this.options.clone) {
-      return yield this._clone(instance);
+      return await this._clone(instance);
     }
 
     return instance;
   }
 
-  *_clone(instance) {
+  async _clone(instance) {
     const { clone } = this.options;
 
     if (clone === true) {
       return _.cloneDeep(instance);
     }
 
-    if (utils.isGeneratorFunction(clone)) {
-      return yield clone(instance);
+    if (utils.isAsyncFunction(clone)) {
+      return await clone(instance);
     }
 
     if (_.isFunction(clone)) {

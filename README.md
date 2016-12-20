@@ -24,8 +24,8 @@ control](https://en.wikipedia.org/wiki/Inversion_of_control) on Wikipedia.
 npm install ashley
 ```
 
-Note that it makes heavy use of generator functions and thus requires
-a Node.js version with generator support (0.11 or newer).
+Note that it makes heavy use of async functions and thus requires a fairly
+recent version of Node.js (7.x or newer).
 
 # Usage
 
@@ -40,22 +40,7 @@ const Ashley = require('ashley');
 const ashley = new Ashley();
 ```
 
-As mentioned at the beginning, Ashley makes heavy use of generator functions. As
-such, it's necessary to use it with a flow control library such as
-[co](https://github.com/tj/co) or similar.
-
-```javascript
-const co = require('co');
-const Ashley = require('ashley');
-
-co(function *() {
-  const ashley = new Ashley();
-  // ...
-}).catch(console.error);
-```
-
-The following code samples will omit the `co` wrapping layer for brevity. Note
-that the code samples will also use the container directly for obtaining the
+Note that the code samples will use the container directly for obtaining the
 configured objects. To take advantage of the dependency injection pattern in a
 real application, the container should be only used explicitly during the
 application's initialization process to set up the dependencies. Read more in
@@ -68,7 +53,7 @@ context is anything that needs to be instantiated with the `new` operator.
 
 ```javascript
 ashley.instance('Logger', ConsoleLogger);
-const logger = yield ashley.resolve('Logger')
+const logger = await ashley.resolve('Logger')
 
 // the same as
 const logger = new ConsoleLogger();
@@ -82,12 +67,12 @@ third argument is a list of dependencies.
 ```javascript
 ashley.instance('Logger', ConsoleLogger);
 ashley.instance('OrderService', OrderService, ['Logger']);
-const orderService = yield ashley.resolve('OrderService')
+const orderService = await ashley.resolve('OrderService')
 
 // the same as
 ashley.instance('Logger', 'src/console_logger');
 ashley.instance('OrderService', 'src/order_service', ['Logger']);
-const orderService = yield ashley.resolve('OrderService')
+const orderService = await ashley.resolve('OrderService')
 
 // the same as
 const logger = new ConsoleLogger();
@@ -129,21 +114,22 @@ For an object such as `DbConnection` to be useful, it needs to actually
 establish an connection which will most likely be an asynchronous process. When
 binding the object, it's possible to specify that an initialization method needs
 to be called for the object to be fully ready. This is similar to a constructor
-but allows the method to be a generator.
+but allows the method to be asynchronous.
 
 ```javascript
 ashley.instance('DbConnection', 'src/rethink_db_connection', [], {
   initialize: true
 });
 ```
-When set to `true`, Ashley will look for a generator method called `initialize`
+
+When set to `true`, Ashley will look for an async method called `initialize`
 and will wait for it to finish before proceeding. It's possible to specify a
 different initialize method by setting `initialize` to the name.
 
 ```javascript
 class RethinkDbConnection {
-  *init() {
-    this.connection = yield r.connect();
+  async init() {
+    this.connection = await r.connect();
   }
 }
 
@@ -173,7 +159,7 @@ ashley.instance('Logger', ConsoleLogger);
 
 The `setup` function will receive the instantiated object as its only
 parameter. Note that the function will be called only once if the scope is set
-to `Singleton` and may or may not be a generator.
+to `Singleton` and may or may not be an async function.
 
 There's also the option to `deinitialize` instances which works the same way
 except it's invoked when the container is being shut down. It generally depends
@@ -183,13 +169,13 @@ shutdown.
 
 ```javascript
 class RethinkDbConnection {
-  *initialize() {
-    this.connection = yield r.connect();
+  async initialize() {
+    this.connection = await r.connect();
   }
 
-  *deinitialize() {
+  async deinitialize() {
     if (this.connection) {
-      yield this.connection.close();
+      await this.connection.close();
     }
   }
 }
@@ -201,7 +187,7 @@ ashley.instance('DbConnection', RethinkDbConnection, [], {
 
 // ...
 
-yield ashley.shutdown();
+await ashley.shutdown();
 ```
 
 Note that Ashley does NOT catch errors from these methods. It's up to the
@@ -218,10 +204,10 @@ bind just plain objects.
 ashley.object('Config', { port: 9001 });
 ashley.object('Title', 'Zoo');
 
-const title = yield ashley.resolve('Title');
+const title = await ashley.resolve('Title');
 ```
 
-By default the binded objects are passed by reference and thus everyone will
+By default the bound objects are passed by reference and thus everyone will
 receive the very same object and can possibly modified it. An alternative is to
 specify the `clone` option which will create a deep copy of the object each time
 it's requested.
@@ -249,7 +235,7 @@ a valid target in itself.
 
 ```javascript
 ashley.object('Config', 'src/config');
-yield ashley.resolve('Config'); // => 'src/config'
+await ashley.resolve('Config'); // => 'src/config'
 ```
 
 ## Binding functions
@@ -259,12 +245,15 @@ necessary to register callbacks which will later be invoked with a given set of
 parameters. For example when using [Koa](http://koajs.com).
 
 ```javascript
-const koa = require('koa')();
+const Koa = require('koa');
+const app = new Koa();
+
+const ConsoleLogger = require('src/console_logger');
 const logger = new ConsoleLogger();
 
-app.use(function *Index(next) {
-  logger.info(`Serving ${this.request.ip}`);
-  this.body = 'Hello world';
+app.use(async function Index(ctx, next) {
+  logger.info(`Serving ${ctx.request.ip}`);
+  ctx.body = 'Hello world';
 });
 
 // or
@@ -272,24 +261,24 @@ app.use(require('src/index'));
 ```
 
 The goal here is to invoke the callback with not only the parameters provided by
-Koa (`next`) but also with configured dependencies, in this case an instance of
+Koa (`ctx` and `next`) but also with configured dependencies, in this case an instance of
 `ConsoleLogger`. It's possible to take advantage of the `function` method as
 follows.
 
 ```javascript
 ashley.instance('Logger', 'src/console_logger');
-ashley.function('Index', 'src/index', [Ashley._, 'Logger']);
+ashley.function('Index', 'src/index', [Ashley._, Ashley._, 'Logger']);
 
-app.use(yield ashley.resolve('Index'));
+app.use(await ashley.resolve('Index'));
 ```
 
 Defining a `function` and passing it immediately afterwards is a very common
 pattern and can be shortened to just a single line. It takes advantage of the
-fact that binding a target returns a generator function which resolves to the
+fact that binding a target returns an async function which resolves to the
 target.
 
 ```javascript
-app.use(yield ashley.function('Index', 'src/index', [Ashley._, 'Logger']));
+app.use(await ashley.function('Index', 'src/index', [Ashley._, Ashley._, 'Logger']));
 ```
 
 Notice the use of the `Ashley._` placeholder. When present, it will be replaced
@@ -299,9 +288,9 @@ function.
 
 ```javascript
 // src/index
-module.exports = function *Index(next, logger) {
-  logger.info(`Serving ${this.request.ip}`);
-  this.body = 'Hello world';
+module.exports = async function Index(ctx, next, logger) {
+  logger.info(`Serving ${ctx.request.ip}`);
+  ctx.body = 'Hello world';
 }
 ```
 
@@ -310,7 +299,7 @@ callback is called with fewer parameters than expected, the remaining
 placeholders are passed in as `undefined`, followed by the declared
 dependencies. When the number of parameters is greater than expected, only those
 with a placeholder will be passed in. Note that the returned function will
-always be a generator function.
+always be an async function.
 
 The Koa framework is officially supported. See [Integration with existing
 frameworks and libraries](#integration-with-existing-frameworks-and-libraries)
@@ -424,12 +413,12 @@ main.instance('Logger', 'src/console_logger');
 // ...
 // Created for every request and bound to the request's context
 const request = main.createChild();
-request.function('Index', 'src/middlewares/index', [Ashley._, 'Logger']);
+request.function('Index', 'src/middlewares/index', [Ashley._, Ashley._, 'Logger']);
 
 // ...
 
 // Shutdown the container at the end
-yield request.shutdown();
+await request.shutdown();
 ```
 
 # Integration with existing frameworks and libraries
@@ -498,9 +487,9 @@ class Service {
     this.itemFactory = itemFactory;
   }
 
-  *action() {
-    const item1 = yield this.itemFactory.create();
-    const item2 = yield this.itemFactory.create();
+  async action() {
+    const item1 = await this.itemFactory.create();
+    const item2 = await this.itemFactory.create();
     // ...
   }
 }
@@ -549,19 +538,6 @@ officially supported in the language), there are a few more reasons:
 - There would be no single place to see the whole dependency graph in one place.
   Instead, the graph would be spread thorough the code base making it difficult
   to make sense of it.
-
-## Why not expose Promises in the public API directly instead of generator functions?
-
-While it would make the library more accessible, it would also complicate the
-internals quite a bit. It's still possible to create a layer on top of the API
-if it's necessary to work with promises however.
-
-```javascript
-const p = co.wrap(ashley.instance('Logger', ConsoleLogger));
-
-p().then(logger => ... ).catch(...);
-p().then(logger => ... ).catch(...);
-```
 
 ## Should I use Ashley for projects of any size?
 

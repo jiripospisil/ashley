@@ -6,8 +6,8 @@ class ObjectBind {
     this._scope = scope;
   }
 
-  *get() {
-    return yield this._scope.get();
+  async get() {
+    return await this._scope.get();
   }
 }
 

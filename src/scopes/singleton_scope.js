@@ -32,21 +32,21 @@ class SingletonScope extends Scope {
     this._creating = false;
   }
 
-  *get() {
+  async get() {
     if (this._instance) {
       return this._instance;
     }
 
     while (this._creating) {
-      yield new Promise(resolve => setTimeout(resolve, 50));
+      await new Promise(resolve => setTimeout(resolve, 50));
     }
 
     if (!this._instance) {
       this._creating = true;
 
       try {
-        const instance = yield this.provider.create();
-        yield this._setupInstance(instance);
+        const instance = await this.provider.create();
+        await this._setupInstance(instance);
         this._instance = instance;
       } catch (e) {
         this._creating = false;
@@ -59,10 +59,10 @@ class SingletonScope extends Scope {
     return this._instance;
   }
 
-  *deinitialize() {
+  async deinitialize() {
     const instance = this._instance;
     this._instance = null;
-    yield this.provider.deinitializeInstance(instance);
+    await this.provider.deinitializeInstance(instance);
   }
 }
 

@@ -4,18 +4,18 @@ const { expect } = require('chai');
 const ObjectBind = require('../../src/binds/object_bind');
 
 describe('ObjectBind', function() {
-  it('delegates the get to the given scope', function *() {
+  it('delegates the get to the given scope', async function() {
     let called = 0;
 
     const scope = {
-      *get() {
+      async get() {
         called++;
       }
     };
 
     const bind = new ObjectBind('name1', scope);
 
-    yield bind.get();
+    await bind.get();
     expect(called).to.equal(1);
   });
 });

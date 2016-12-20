@@ -10,22 +10,22 @@ class FunctionProvider {
     this.dependencies = dependencies || [];
   }
 
-  *create() {
+  async create() {
     const self = this;
 
-    return function *(...args) {
+    return async function(...args) {
       const dependencies = [];
 
       for(const dependency of self.dependencies) {
         if (dependency === utils._) {
           dependencies.push(args.shift());
         } else {
-          dependencies.push(yield self.container.resolve(dependency));
+          dependencies.push(await self.container.resolve(dependency));
         }
       }
 
-      if (utils.isGeneratorFunction(self.fn)) {
-        return yield self.fn.call(this, ...dependencies);
+      if (utils.isAsyncFunction(self.fn)) {
+        return await self.fn.call(this, ...dependencies);
       }
       return self.fn.call(this, ...dependencies);
     };

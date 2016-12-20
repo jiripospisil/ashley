@@ -5,7 +5,7 @@ const { expect } = require('chai');
 const FactoryProvider = require('../../src/providers/factory_provider');
 
 describe('FactoryProvider', function() {
-  it('calls the provided function to get the instance', function *() {
+  it('calls the provided function to get the instance', async function() {
     let called = 0;
 
     const fn = function() {
@@ -14,7 +14,7 @@ describe('FactoryProvider', function() {
     };
 
     const container = {
-      *resolveAll(dependencies) {
+      async resolveAll(dependencies) {
         called++;
         expect(dependencies).to.deep.equal(['a', 'b']);
         return ['a1', 'b1'];
@@ -22,7 +22,7 @@ describe('FactoryProvider', function() {
     };
 
     const provider = new FactoryProvider('name1', container, fn, ['a', 'b']);
-    const result = yield provider.create();
+    const result = await provider.create();
 
     expect(result).to.equal(42);
     expect(called).to.equal(2);
