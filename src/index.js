@@ -24,7 +24,7 @@ const utils = require('./utils');
 
 module.exports = function(options) {
   const opts = options || {};
-  const targetResolver = new CachingTargetResolver(new TargetResolver(options));
+  const targetResolver = new CachingTargetResolver(new TargetResolver(opts));
 
   const bindFactory = new BindFactory({
     Instance: CompleteBind,
@@ -49,7 +49,7 @@ module.exports = function(options) {
   ashley.object('@containers/self', ashley);
 
   if (opts.parent) {
-    ashley.object('@containers/parent', options.parent);
+    ashley.object('@containers/parent', opts.parent);
   }
 
   return ashley;
