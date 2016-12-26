@@ -27,20 +27,6 @@ class Scope {
       }
     }
   }
-
-  async handleMessage(type, ...args) {
-    const fn = this[type];
-
-    if (!fn) {
-      return;
-    }
-
-    if (utils.isAsyncFunction(fn)) {
-      await fn.call(this, ...args);
-    } else if (_.isFunction(fn)) {
-      fn.call(this, ...args);
-    }
-  }
 }
 
 module.exports = Scope;
