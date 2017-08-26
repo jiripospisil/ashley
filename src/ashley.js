@@ -37,7 +37,7 @@ class Ashley {
 
     const bind = this._bind(name, this._bindFactory.create('Instance', this, name, scope, provider));
 
-    this.factory(name, async function() {
+    this.factory(name, async function instanceFactory() {
       return provider.create();
     });
 
