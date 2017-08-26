@@ -15,6 +15,7 @@ const PrototypeScope = require('./scopes/prototype_scope');
 const CloneScope = require('./scopes/clone_scope');
 
 const BindFactory = require('./bind_factory');
+const BindValidator = require('./bind_validator');
 const CompleteBind = require('./binds/complete_bind');
 const FactoryBind = require('./binds/factory_bind');
 const ClassBind = require('./binds/class_bind');
@@ -34,7 +35,7 @@ module.exports = function(options) {
     Object: ObjectBind,
     Provider: ClassBind,
     Scope: ClassBind
-  });
+  }, BindValidator);
 
   const ashley = new Ashley(targetResolver, bindFactory, opts);
 

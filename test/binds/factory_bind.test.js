@@ -2,6 +2,7 @@
 
 const { expect } = require('chai');
 const FactoryBind = require('../../src/binds/factory_bind');
+const BindValidator = require('../../src/bind_validator');
 
 describe('FactoryBind', function() {
   it('validates itself before returning the provider', async function() {
@@ -15,7 +16,7 @@ describe('FactoryBind', function() {
     };
 
     const provider = { dependencies: ['dep1'] };
-    const bind = new FactoryBind(container, 'name1', provider);
+    const bind = new FactoryBind(container, 'name1', provider, BindValidator);
 
     try {
       await bind.get();
@@ -27,7 +28,7 @@ describe('FactoryBind', function() {
   });
 
   it('returns the given provider', async function() {
-    const bind = new FactoryBind('container1', 'name1', 'provider1');
+    const bind = new FactoryBind('container1', 'name1', 'provider1', BindValidator);
     expect(bind.get()).to.equal('provider1');
   });
 });

@@ -1,13 +1,12 @@
 'use strict';
 
-const BindValidator = require('../bind_validator');
-
 class CompleteBind {
-  constructor(container, name, scope, provider) {
+  constructor(container, name, scope, provider, BindValidator) {
     this._container = container;
     this._name = name;
     this._scope = scope;
     this._provider = provider;
+    this._BindValidator = BindValidator;
 
     this._validated = false;
   }
@@ -19,7 +18,7 @@ class CompleteBind {
 
   validate(state) {
     if (!this._validated) {
-      new BindValidator(this._container, this._name, this._provider.dependencies || [])
+      new this._BindValidator(this._container, this._name, this._provider.dependencies || [])
         .validate(state);
       this._validated = true;
     }
