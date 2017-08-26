@@ -2,7 +2,6 @@
 
 const _ = require('lodash');
 
-const utils = require('../utils');
 const errors = require('../errors');
 const Scope = require('../scope');
 
@@ -11,7 +10,7 @@ class CloneScope extends Scope {
     const instance = await this.provider.create();
 
     if (this.options.clone) {
-      return await this._clone(instance);
+      return this._clone(instance);
     }
 
     return instance;
@@ -20,19 +19,17 @@ class CloneScope extends Scope {
   async _clone(instance) {
     const { clone } = this.options;
 
-    if (clone === true) {
-      return _.cloneDeep(instance);
-    }
-
-    if (utils.isAsyncFunction(clone)) {
-      return await clone(instance);
+    if (_.isBoolean(clone)) {
+      if (clone === true) {
+        return _.cloneDeep(instance);
+      }
     }
 
     if (_.isFunction(clone)) {
       return clone(instance);
     }
 
-    throw new errors.Error(`Expected "clone" be to a function or "true" but got "${clone}".`);
+    throw new errors.Error(`Expected "clone" be to a function or a boolean but got "${clone}".`);
   }
 }
 

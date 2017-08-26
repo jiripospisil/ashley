@@ -73,7 +73,7 @@ describe('CloneScope', function() {
 
   it('validates the clone option', async function() {
     const initial = { foo: 42 };
-    const provider = function *() {
+    const provider = async function() {
       return initial;
     };
 
@@ -85,7 +85,7 @@ describe('CloneScope', function() {
       await scope.get();
       throw new Error('should not be here');
     } catch (e) {
-      expect(e).to.match(/be to a function or "true" but got "not_a_function"/);
+      expect(e).to.match(/be to a function or a boolean but got "not_a_function"/);
     }
   });
 });

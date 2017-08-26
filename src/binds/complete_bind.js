@@ -13,7 +13,7 @@ class CompleteBind extends ValidatableBind {
 
   async get() {
     this.validate();
-    return await this._scope.get();
+    return this._scope.get();
   }
 
   get dependencies() {

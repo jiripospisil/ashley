@@ -79,7 +79,7 @@ describe('Ashley', function() {
 
       expect(() => {
         ashley.instance('Instance', Class);
-      }).to.throw(Error, /There\'s already a bind called "Instance"/);
+      }).to.throw(Error, /There's already a bind called "Instance"/);
     });
 
     describe('scopes', function() {
@@ -126,7 +126,7 @@ describe('Ashley', function() {
         class CustomPrototypeScope extends Scope {
           async get() {
             called++;
-            return await this.provider.create();
+            return this.provider.create();
           }
         }
 

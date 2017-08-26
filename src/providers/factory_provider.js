@@ -1,7 +1,5 @@
 'use strict';
 
-const utils = require('../utils');
-
 class FactoryProvider {
   constructor(bindName, container, fn, dependencies) {
     this.bindName = bindName;
@@ -12,11 +10,6 @@ class FactoryProvider {
 
   async create() {
     const dependencies = await this.container.resolveAll(this.dependencies);
-
-    if (utils.isAsyncFunction(this.fn)) {
-      return await this.fn(...dependencies);
-    }
-
     return this.fn(...dependencies);
   }
 }

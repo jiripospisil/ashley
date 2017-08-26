@@ -2,7 +2,6 @@
 
 const _ = require('lodash');
 
-const utils = require('./utils');
 const errors = require('./errors');
 
 class Scope {
@@ -18,10 +17,8 @@ class Scope {
     const { setup } = this.options;
 
     if (setup) {
-      if (utils.isAsyncFunction(setup)) {
-        await setup(instance);
-      } else if (_.isFunction(setup)) {
-        setup(instance);
+      if (_.isFunction(setup)) {
+        return setup(instance);
       } else {
         throw new errors.Error(`Expected "setup" be to a function but got "${setup}".`);
       }

@@ -2,7 +2,6 @@
 
 const _ = require('lodash');
 
-const utils = require('../utils');
 const errors = require('../errors');
 
 class InstanceProvider {
@@ -28,17 +27,6 @@ class InstanceProvider {
     return instance;
   }
 
-  async _initializeInstance(instance) {
-    const { initialize } = this.options;
-    const methodName = this._lifeCycleMethodName(initialize, 'initialize');
-
-    if (instance[methodName] && utils.isAsyncFunction(instance[methodName])) {
-      return await instance[methodName].call(instance);
-    }
-
-    throw new errors.Error(`Unable to find an async method called "${methodName}" on an instance of "${this.bindName}".`);
-  }
-
   async deinitializeInstance(instance) {
     if (!instance) {
       return;
@@ -47,8 +35,19 @@ class InstanceProvider {
     const { deinitialize } = this.options;
     const methodName = this._lifeCycleMethodName(deinitialize, 'deinitialize');
 
-    if (instance[methodName] && utils.isAsyncFunction(instance[methodName])) {
-      return await instance[methodName].call(instance);
+    if (instance[methodName]) {
+      return instance[methodName].call(instance);
+    }
+
+    throw new errors.Error(`Unable to find an async method called "${methodName}" on an instance of "${this.bindName}".`);
+  }
+
+  async _initializeInstance(instance) {
+    const { initialize } = this.options;
+    const methodName = this._lifeCycleMethodName(initialize, 'initialize');
+
+    if (instance[methodName]) {
+      return instance[methodName].call(instance);
     }
 
     throw new errors.Error(`Unable to find an async method called "${methodName}" on an instance of "${this.bindName}".`);

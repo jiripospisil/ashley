@@ -24,9 +24,6 @@ class FunctionProvider {
         }
       }
 
-      if (utils.isAsyncFunction(self.fn)) {
-        return await self.fn.call(this, ...dependencies);
-      }
       return self.fn.call(this, ...dependencies);
     };
   }
