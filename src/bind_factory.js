@@ -13,9 +13,9 @@ class BindFactory {
     this.mapping = mapping;
   }
 
-  create(bindType, container, name, scope, provider) {
+  create(bindType, ...args) {
     if (this.mapping[bindType]) {
-      return new this.mapping[bindType](container, name, scope, provider);
+      return new this.mapping[bindType](...args);
     }
 
     throw new errors.Error(`Unknown bind "${bindType}".`);
