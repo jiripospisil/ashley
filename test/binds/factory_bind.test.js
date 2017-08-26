@@ -4,12 +4,6 @@ const { expect } = require('chai');
 const FactoryBind = require('../../src/binds/factory_bind');
 
 describe('FactoryBind', function() {
-  it('delegates dependencies to the given provider', function() {
-    const provider = { dependencies: ['dep1'] };
-    const bind = new FactoryBind('container', 'name1', provider);
-    expect(bind.dependencies).to.deep.equal(provider.dependencies);
-  });
-
   it('validates itself before returning the provider', async function() {
     let called = 0;
 

@@ -4,12 +4,6 @@ const { expect } = require('chai');
 const CompleteBind = require('../../src/binds/complete_bind');
 
 describe('CompleteBind', function() {
-  it('delegates dependencies to the given provider', function() {
-    const provider = { dependencies: ['dep1'] };
-    const bind = new CompleteBind('container', 'name1', 'scope1', provider);
-    expect(bind.dependencies).to.deep.equal(provider.dependencies);
-  });
-
   it('validates itself before calling the scope', async function() {
     let called = 0;
 
