@@ -4,7 +4,7 @@
   "description": "Ashley is a dependency injection container for JavaScript.",
   "main": "index.js",
   "scripts": {
-    "test": "cross-env NODE_ENV=test mocha --harmony-async-await",
+    "test": "cross-env NODE_ENV=test mocha",
     "pretest": "cross-env NODE_ENV=test eslint ."
   },
   "author": "Jiri Pospisil <jiri@sensible.io> (http://jpospisil.com)",
