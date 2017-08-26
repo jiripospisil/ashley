@@ -5,7 +5,9 @@
   "main": "index.js",
   "scripts": {
     "test": "cross-env NODE_ENV=test mocha",
-    "pretest": "cross-env NODE_ENV=test eslint ."
+    "pretest": "npm run lint",
+    "lint": "eslint .",
+    "lint-fix": "eslint --fix ."
   },
   "author": "Jiri Pospisil <jiri@sensible.io> (http://jpospisil.com)",
   "license": "ISC",
@@ -22,7 +24,7 @@
     "chai": "^3.5.0",
     "co": "^4.6.0",
     "cross-env": "^3.1.1",
-    "eslint": "^3.12.2",
+    "eslint": "^4.5.0",
     "mocha": "^3.2.0"
   },
   "files": [
