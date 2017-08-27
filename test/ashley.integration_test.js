@@ -477,22 +477,29 @@ describe('Ashley', function() {
       }, [], { deinitialize: 'deinit' });
       await ashley.resolve('Dependency2');
 
-      // Not initialized
       ashley.instance('Dependency3', class {
+        async deinit() {
+          called++;
+        }
+      }, [], { deinitialize: 'deinit', scope: 'Prototype' });
+      await ashley.resolve('Dependency3');
+
+      // Not initialized
+      ashley.instance('Dependency4', class {
         async deinitialize() {
           called++;
         }
       }, [], { deinitialize: true });
 
-      ashley.instance('Dependency4', class {
+      ashley.instance('Dependency5', class {
         async deinit() {
           called++;
         }
-      }, [], { deinitialize: true, scope: 'Prototype' });
+      }, [], { deinitialize: 'deinit', scope: 'Prototype' });
 
       await ashley.shutdown();
 
-      expect(called).to.equal(2);
+      expect(called).to.equal(3);
     });
   });
 
