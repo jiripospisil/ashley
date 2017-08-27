@@ -34,7 +34,7 @@ class DependencyC {
     console.log('DependencyC: Initialized');
   }
 
-  async deinitialize() {
+  deinitialize() {
     console.log('DependencyC: Deinitialized');
   }
 }
