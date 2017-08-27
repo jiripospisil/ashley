@@ -39,7 +39,7 @@ class InstanceProvider {
       return instance[methodName].call(instance);
     }
 
-    throw new errors.Error(`Unable to find an async method called "${methodName}" on an instance of "${this.bindName}".`);
+    throw new errors.Error(`Unable to find a method called "${methodName}" on an instance of "${this.bindName}".`);
   }
 
   async _initializeInstance(instance) {
@@ -50,7 +50,7 @@ class InstanceProvider {
       return instance[methodName].call(instance);
     }
 
-    throw new errors.Error(`Unable to find an async method called "${methodName}" on an instance of "${this.bindName}".`);
+    throw new errors.Error(`Unable to find a method called "${methodName}" on an instance of "${this.bindName}".`);
   }
 
   _lifeCycleMethodName(value, defaultValue) {
