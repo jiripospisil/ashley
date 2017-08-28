@@ -63,8 +63,13 @@ describe('SingletonScope', function() {
     };
 
     const setup = async function(newObj) {
-      called++;
-      expect(newObj).to.equal(obj);
+      await new Promise(resolve => {
+        expect(newObj).to.equal(obj);
+        setTimeout(() => {
+          called++;
+          resolve();
+        }, 10);
+      });
     };
 
     const scope = new SingletonScope({ create: provider }, { setup });

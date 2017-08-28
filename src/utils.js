@@ -5,11 +5,3 @@
  * as part of the injected dependencies.
  */
 module.exports._ = '<ARG_PLACEHOLDER>';
-
-module.exports.isAsyncFunction = function(fn) {
-  if (!fn || !fn.constructor) {
-    return false;
-  }
-
-  return fn.constructor.name === 'AsyncFunction';
-};

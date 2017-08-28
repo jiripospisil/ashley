@@ -28,6 +28,6 @@ module.exports = {
       "always"
     ],
     "no-console": "off",
-    "require-yield": "off"
+    "no-return-await": "error"
   }
 };

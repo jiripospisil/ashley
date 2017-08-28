@@ -163,10 +163,15 @@ parameter. Note that the function will be called only once if the scope is set
 to `Singleton` and may or may not be an async function.
 
 There's also the option to `deinitialize` instances which works the same way
-except it's invoked when the container is being shut down. It generally depends
-on the scope used whether the method is supported or when it's called. The
-provided `Singleton` scope will call the method only when the container is being
-shutdown.
+except it's invoked when the container is being shut down. It generally
+depends on the scope used whether the method is supported or when it's
+called.
+
+The provided `Singleton` and `Prototype` scopes will call the method only when
+the container is being shutdown. This means that the individual instances need
+to be kept in memory until that happens. Consider calling the `deinitialize`
+method manually on the objects in case they are short lived and keeping them in
+memory until the container shuts down is problematic.
 
 ```javascript
 class RethinkDbConnection {

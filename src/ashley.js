@@ -3,7 +3,6 @@
 const debug = require('debug')('Ashley::Container');
 const _ = require('lodash');
 
-const utils = require('./utils');
 const errors = require('./errors');
 
 class Ashley {
@@ -38,8 +37,8 @@ class Ashley {
 
     const bind = this._bind(name, this._bindFactory.create('Instance', this, name, scope, provider));
 
-    this.factory(name, async function() {
-      return await provider.create();
+    this.factory(name, async function instanceFactory() {
+      return provider.create();
     });
 
     if (_.get(options, 'deinitialize')) {
@@ -74,7 +73,7 @@ class Ashley {
     const provider = new Provider(name, this, resolvedTarget, dependencies);
 
     return this._bind(`@factories/${name}`, this._bindFactory.create('Factory', this,
-          name, provider));
+      name, provider));
   }
 
   link(name, factoryName, options) {
@@ -109,9 +108,6 @@ class Ashley {
     const bind = this.findBind(name);
 
     if (bind) {
-      if (utils.isAsyncFunction(bind.get)) {
-        return await bind.get();
-      }
       return bind.get();
     }
 

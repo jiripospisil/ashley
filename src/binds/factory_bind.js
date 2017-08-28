@@ -1,13 +1,11 @@
 'use strict';
 
-const ValidatableBind = require('../validatable_bind');
-
-class FactoryBind extends ValidatableBind {
-  constructor(container, name, provider) {
-    super(container);
-
+class FactoryBind {
+  constructor(container, name, provider, BindValidator) {
+    this._container = container;
     this._name = name;
     this._provider = provider;
+    this._BindValidator = BindValidator;
   }
 
   get() {
@@ -15,8 +13,12 @@ class FactoryBind extends ValidatableBind {
     return this._provider;
   }
 
-  get dependencies() {
-    return this._provider.dependencies || [];
+  validate(state) {
+    if (!this._validated) {
+      new this._BindValidator(this._container, this._name, this._provider.dependencies || [])
+        .validate(state);
+      this._validated = true;
+    }
   }
 }
 

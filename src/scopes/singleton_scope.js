@@ -62,7 +62,7 @@ class SingletonScope extends Scope {
   async deinitialize() {
     const instance = this._instance;
     this._instance = null;
-    await this.provider.deinitializeInstance(instance);
+    return this.provider.deinitializeInstance(instance);
   }
 }
 

@@ -7,7 +7,7 @@ class ObjectBind {
   }
 
   async get() {
-    return await this._scope.get();
+    return this._scope.get();
   }
 }
 

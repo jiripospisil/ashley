@@ -1,18 +1,24 @@
 'use strict';
 
 const { expect } = require('chai');
-const ValidatableBind = require('../src/validatable_bind');
+const BindValidator = require('../src/bind_validator');
 
-describe('ValidatableBind', function() {
-  class Bind extends ValidatableBind {
+describe('BindValidator', function() {
+  class Bind {
     constructor(name, container, dependencies) {
-      super(container);
       this._name = name;
+      this._container = container;
       this._dependencies = dependencies;
+
+      this._validated = false;
     }
 
-    get dependencies() {
-      return this._dependencies;
+    validate(state) {
+      if (!this._validated) {
+        new BindValidator(this._container, this._name, this._dependencies)
+          .validate(state);
+        this._validated = true;
+      }
     }
   }
 

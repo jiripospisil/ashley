@@ -9,13 +9,15 @@ const errors = require('./errors');
  * and can be configured with a different set implementations if necessary.
  */
 class BindFactory {
-  constructor(mapping) {
-    this.mapping = mapping;
+  constructor(mapping, BindValidator) {
+    this._mapping = mapping;
+    this._BindValidator = BindValidator;
   }
 
-  create(bindType, container, name, scope, provider) {
-    if (this.mapping[bindType]) {
-      return new this.mapping[bindType](container, name, scope, provider);
+  create(bindType, ...args) {
+    if (this._mapping[bindType]) {
+      args.push(this._BindValidator);
+      return new this._mapping[bindType](...args);
     }
 
     throw new errors.Error(`Unknown bind "${bindType}".`);

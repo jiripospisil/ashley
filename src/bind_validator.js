@@ -1,38 +1,28 @@
 'use strict';
 
-const debug = require('debug')('Ashley::Bind');
-
 const State = require('./state');
 const utils = require('./utils');
 const errors = require('./errors');
 
-class ValidatableBind {
-  constructor(container) {
-    this.container = container;
-    this.validated = false;
+class BindValidator {
+  constructor(container, bindName, dependencies) {
+    this._container = container;
+    this._bindName = bindName;
+    this._dependencies = dependencies;
   }
 
   validate(state) {
-    if (!this.validated) {
-      state = state || new State(this._name);
+    state = state || new State(this._bindName);
 
-      this.dependencies.forEach(dep => {
-        if (dep !== utils._) {
-          this._validate(dep, state.fork());
-        }
-      });
-
-      this.validated = true;
-    }
-  }
-
-  invalidate() {
-    debug(`Invalidating "${this._name}".`);
-    this.validated = false;
+    this._dependencies.forEach(dep => {
+      if (dep !== utils._) {
+        this._validate(dep, state.fork());
+      }
+    });
   }
 
   _validate(dependencyName, state) {
-    const bind = this.container.findBind(dependencyName);
+    const bind = this._container.findBind(dependencyName);
 
     if (!bind) {
       throw new errors.Error(`Unable to resolve unbinded dependency "${dependencyName}" as requested by "${state.top}".`);
@@ -49,4 +39,4 @@ class ValidatableBind {
   }
 }
 
-module.exports = ValidatableBind;
+module.exports = BindValidator;

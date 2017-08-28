@@ -105,27 +105,4 @@ describe('InstanceProvider', function() {
       expect(e).to.match(/Unable to find/);
     }
   });
-
-  it('throws an exception if the initialize method is found but it\'s not an async function', async function() {
-    class Target {
-      init() {}
-    }
-
-    const container = {
-      async resolveAll() {
-        return [];
-      }
-    };
-
-    const provider = new InstanceProvider('name1', container, Target, [], {
-      initialize: 'init'
-    });
-
-    try {
-      await provider.create();
-      throw new Error('should not be here');
-    } catch (e) {
-      expect(e).to.match(/Unable to find/);
-    }
-  });
 });
