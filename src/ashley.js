@@ -16,7 +16,8 @@ class Ashley {
   }
 
   async shutdown() {
-    for (const scope of this._scopesToDeinitialize) {
+    for (let i = this._scopesToDeinitialize.length - 1; i >= 0; i--) {
+      const scope = this._scopesToDeinitialize[i];
       if (scope.deinitialize) {
         await scope.deinitialize();
       }
