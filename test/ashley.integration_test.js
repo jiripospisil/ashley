@@ -501,6 +501,45 @@ describe('Ashley', function() {
 
       expect(called).to.equal(3);
     });
+
+    it('calls deinitialize in reverse order to preserve hierarchie', async function() {
+      const ashley = new Ashley();
+      const called = [];
+
+      ashley.instance('Dependency1', class {
+        async deinitialize() {
+          called.push('Dependency1');
+        }
+      }, [], { deinitialize: true });
+
+      ashley.instance('Dependency2', class {
+        async deinitialize() {
+          called.push('Dependency2');
+        }
+      }, [], { deinitialize: true });
+
+      ashley.instance('Dependency3', class {
+        async deinitialize() {
+          called.push('Dependency3');
+        }
+      }, ['Dependency1', 'Dependency2'], { deinitialize: true });
+
+      ashley.instance('Main', class {
+        async deinitialize() {
+          called.push('Main');
+        }
+      }, ['Dependency3'], { deinitialize: true });
+
+      await ashley.resolve('Main');
+      await ashley.shutdown();
+
+      expect(called).to.deep.equal([
+        'Main',
+        'Dependency3',
+        'Dependency2',
+        'Dependency1'
+      ]);
+    });
   });
 
   describe('#createChild', function() {
