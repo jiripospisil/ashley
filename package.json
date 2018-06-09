@@ -17,15 +17,15 @@
   },
   "homepage": "https://github.com/jiripospisil/ashley",
   "dependencies": {
-    "debug": "^2.2.0",
-    "lodash": "^4.15.0"
+    "debug": "^2.6.9",
+    "lodash": "^4.17.10"
   },
   "devDependencies": {
     "chai": "^3.5.0",
     "co": "^4.6.0",
     "cross-env": "^3.1.1",
-    "eslint": "^4.5.0",
-    "mocha": "^3.2.0"
+    "eslint": "^4.19.1",
+    "mocha": "^5.2.0"
   },
   "files": [
     "index.js",
