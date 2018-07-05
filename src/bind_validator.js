@@ -25,7 +25,7 @@ class BindValidator {
     const bind = this._container.findBind(dependencyName);
 
     if (!bind) {
-      throw new errors.Error(`Unable to resolve unbinded dependency "${dependencyName}" as requested by "${state.top}".`);
+      throw new errors.Error(`Unable to resolve unbound dependency "${dependencyName}" as requested by "${state.top}".`);
     }
 
     if (state.has(dependencyName)) {
