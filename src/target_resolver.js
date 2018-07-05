@@ -65,7 +65,7 @@ class TargetResolver {
 
   _loadTarget(filepath) {
     try {
-      const obj = require(filepath);
+      const obj = require(`${filepath}`);
       debug(`Succesfully loaded "${filepath}".`);
       return obj;
     } catch (e) {
