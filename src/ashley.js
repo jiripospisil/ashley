@@ -112,7 +112,7 @@ class Ashley {
       return bind.get();
     }
 
-    throw new errors.Error(`Unable to resolve unbinded target "${name}".`);
+    throw new errors.Error(`Unable to resolve unbound target "${name}".`);
   }
 
   async resolveAll(names) {

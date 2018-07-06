@@ -57,7 +57,7 @@ describe('BindValidator', function() {
     const container = new Container();
     const bind1 = container.addBind('Bind1', ['Bind2']);
 
-    expect(() => bind1.validate()).to.throw(Error, /unbinded dependency "Bind2" as requested by "Bind1"/);
+    expect(() => bind1.validate()).to.throw(Error, /unbound dependency "Bind2" as requested by "Bind1"/);
   });
 
   it('throws when any of the dependencies is not found #2', function() {
@@ -67,7 +67,7 @@ describe('BindValidator', function() {
     container.addBind('Bind3', []);
     container.addBind('Bind4', ['Bind5']);
 
-    expect(() => bind1.validate()).to.throw(Error, /unbinded dependency "Bind5" as requested by "Bind4"/);
+    expect(() => bind1.validate()).to.throw(Error, /unbound dependency "Bind5" as requested by "Bind4"/);
   });
 
   it('allows correct chains #1', function() {
